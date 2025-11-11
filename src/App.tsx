@@ -1,100 +1,85 @@
 import { useEffect, useRef, useState } from "react";
 import { getVideoSrc } from "./utils/getVideoSrc";
 
-// Componentes A-Frame tipados
 const AScene = 'a-scene' as any;
 const AAssets = 'a-assets' as any;
 const AVideosphere = 'a-videosphere' as any;
 const AEntity = 'a-entity' as any;
 
+const PLAYBACK_ID = "VQ1yPMehRhzKcH8Kv502Sh33IKjEHezxA54LB9MpAalM";
+
 export default function App() {
   const hasStartedRef = useRef(false);
-  const [videoError, setVideoError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [aframeLoaded, setAframeLoaded] = useState(false);
 
   useEffect(() => {
-    // Set video source dynamically based on platform when component mounts
-    const video = document.getElementById("vid360") as HTMLVideoElement | null;
-    if (video) {
-      const videoSrc = getVideoSrc("VQ1yPMehRhzKcH8Kv502Sh33IKjEHezxA54LB9MpAalM");
-      console.log("Loading video from:", videoSrc);
-      video.setAttribute("src", videoSrc);
-      
-      // Add error handler
-      video.addEventListener("error", (e) => {
-        console.error("Video loading error:", e);
-        setVideoError("Error al cargar el video. Por favor recarga la página.");
-        setIsLoading(false);
-      });
-
-      // Add success handler
-      video.addEventListener("loadeddata", () => {
-        console.log("Video loaded successfully");
-        setIsLoading(false);
-        setVideoError(null);
-      });
-
-      // Force video to start loading immediately
-      video.load();
-    }
+    const checkAFrame = () => {
+      if ((window as any).AFRAME) {
+        setAframeLoaded(true);
+      } else {
+        setTimeout(checkAFrame, 100);
+      }
+    };
+    checkAFrame();
   }, []);
 
-  function handleStart() {
+  useEffect(() => {
+    if (!aframeLoaded) return;
+    
+    const video = document.getElementById("vid360") as HTMLVideoElement;
+    if (video) {
+      video.src = getVideoSrc(PLAYBACK_ID);
+      video.load();
+    }
+  }, [aframeLoaded]);
+
+  async function handleStart() {
     if (hasStartedRef.current) return;
     hasStartedRef.current = true;
 
-    const video = document.getElementById("vid360") as HTMLVideoElement | null;
-    if (!video) {
-      console.error("Video element not found");
-      return;
+    const video = document.getElementById("vid360") as HTMLVideoElement;
+    if (!video) return;
+
+    // Request device orientation permission (iOS 13+)
+    if (typeof (DeviceOrientationEvent as any)?.requestPermission === 'function') {
+      try {
+        await (DeviceOrientationEvent as any).requestPermission();
+      } catch (e) {
+        console.warn('Permission denied:', e);
+      }
     }
 
-    // Request fullscreen on mobile to avoid Safari UI
-    const enterFullscreen = () => {
-      // Try webkit fullscreen first (iOS Safari)
-      if ((video as any).webkitEnterFullscreen) {
-        try {
-          (video as any).webkitEnterFullscreen();
-        } catch (e) {
-          console.log("Webkit fullscreen not available:", e);
-        }
-      }
-      // Try standard fullscreen API as fallback
-      else if (video.requestFullscreen) {
-        video.requestFullscreen().catch((e) => {
-          console.log("Fullscreen not available:", e);
-        });
-      }
-    };
-
-    // Enter fullscreen before playing
-    enterFullscreen();
-
-    // Try to play with audio first, fallback to muted if blocked
+    // Play video
     video.muted = false;
     video.play().catch(() => {
-      console.log("Audio blocked, playing muted");
       video.muted = true;
       video.play();
     });
 
-    // Enter VR mode programmatically
-    const scene = document.querySelector("a-scene") as any;
-    if (scene && scene.enterVR) {
-      setTimeout(() => {
-        scene.enterVR();
-      }, 500); // Small delay to ensure video starts
-    }
-
-    // Hide gate screen
+    // Hide gate
     const gate = document.getElementById("gate");
-    if (gate) {
-      gate.style.display = "none";
+    if (gate) gate.style.display = "none";
+
+    // Enter VR
+    const scene = document.querySelector("a-scene") as any;
+    if (scene?.enterVR) {
+      setTimeout(() => scene.enterVR(), 500);
     }
   }
 
+  if (!aframeLoaded) {
     return (
-      <div className="w-full h-screen bg-black">
+      <div className="w-full h-screen bg-black flex items-center justify-center">
+        <div className="text-center text-white">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-lg">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full h-screen bg-black">
       {/* Gate Screen - User must interact before entering VR */}
       <div
         id="gate"
@@ -116,28 +101,9 @@ export default function App() {
           <p className="text-sm text-gray-400 mb-8">
             Para una mejor experiencia, usa tus gafas de realidad virtual.
           </p>
-          
-          {/* Loading indicator */}
-          {isLoading && !videoError && (
-            <div className="mb-6">
-              <div className="flex items-center justify-center gap-2">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                <span className="text-sm text-gray-300">Cargando video...</span>
-              </div>
-            </div>
-          )}
-
-          {/* Error message */}
-          {videoError && (
-            <div className="mb-6 p-4 bg-red-500 bg-opacity-20 border border-red-500 rounded-lg">
-              <p className="text-sm text-red-200">{videoError}</p>
-            </div>
-          )}
-
           <button
             onClick={handleStart}
-            disabled={isLoading || !!videoError}
-            className="rounded-full px-12 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-lg shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            className="rounded-full px-12 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-lg shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-300"
           >
             Iniciar
           </button>
@@ -147,17 +113,20 @@ export default function App() {
       {/* A-Frame VR Scene */}
       <AScene
         embedded
+        device-orientation-permission-ui="enabled: true"
         vr-mode-ui="enabled: true"
         renderer="colorManagement: true; antialias: true"
       >
-        <AAssets timeout="30000">
+        <AAssets timeout="15000">
           <video
             id="vid360"
             playsInline
             webkit-playsinline="true"
             muted
+            autoPlay
             loop
             preload="auto"
+            crossOrigin="anonymous"
           ></video>
         </AAssets>
 
