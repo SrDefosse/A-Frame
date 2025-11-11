@@ -1,0 +1,14 @@
+INSTRUCCIONES PARA VIDEO LOCAL:
+
+1. Coloca tu video 360° MP4 aquí con el nombre "video360.mp4"
+2. Asegúrate de que sea formato equirectangular (360° esférico)
+3. Modifica src/utils/getVideoSrc.ts para usar source: 'local'
+4. Recarga la aplicación
+
+El video debe ser:
+- Formato: MP4 (H.264)
+- Resolución: 1920x960 o superior (relación 2:1)
+- Tamaño: Lo más pequeño posible (máx. 100MB recomendado)
+
+Si no tienes un video 360°, puedes descargar uno de ejemplo desde:
+https://archive.org/details/360-degree-videos
