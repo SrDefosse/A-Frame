@@ -14,7 +14,7 @@ export default function App() {
     // Set video source dynamically based on platform when component mounts
     const video = document.getElementById("vid360") as HTMLVideoElement | null;
     if (video) {
-      const videoSrc = getVideoSrc("rR8P8mSaKDzz02TsftugTUdI00cQPJX00oy"); // Tu playback ID real
+      const videoSrc = getVideoSrc("N4Ya01cvSRoJX2S7JsMEAwTCvrsOqmbUjP00E767qNdbo"); // Tu playback ID real
       video.setAttribute("src", videoSrc);
     }
   }, []);
@@ -57,20 +57,27 @@ export default function App() {
       {/* Gate Screen - User must interact before entering VR */}
       <div
         id="gate"
-        className="absolute inset-0 z-10 flex items-center justify-center bg-black/90"
+        className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gray-900 bg-opacity-95 p-6"
       >
-        <div className="text-center text-white px-6 max-w-md">
-          <h1 className="text-2xl font-bold mb-4">Experiencia VR 360°</h1>
-          <p className="text-sm opacity-90 mb-6 leading-relaxed">
-            Toca <strong>Iniciar</strong> para habilitar los sensores de
-            movimiento y comenzar la reproducción del video.
+        <div className="text-center text-white max-w-lg">
+          <div className="mb-8">
+            <svg className="w-20 h-20 mx-auto text-white opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </div>
+          <h1 className="text-4xl font-extrabold mb-4 tracking-tight">
+            Experiencia VR 360°
+          </h1>
+          <p className="text-base text-gray-300 mb-6 leading-relaxed">
+            Presiona <strong>Iniciar</strong> para activar los sensores de movimiento y sumergirte en el video.
           </p>
-          <p className="text-xs opacity-75 mb-6">
-            Después de iniciar, coloca tu teléfono en las gafas VR Cardboard.
+          <p className="text-sm text-gray-400 mb-8">
+            Para una mejor experiencia, usa tus gafas de realidad virtual.
           </p>
           <button
             onClick={handleStart}
-            className="rounded-lg px-8 py-3 bg-white text-black font-semibold text-lg hover:bg-gray-100 transition-colors"
+            className="rounded-full px-12 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-lg shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-300"
           >
             Iniciar
           </button>
