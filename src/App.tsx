@@ -14,8 +14,10 @@ export default function App() {
     // Set video source dynamically based on platform when component mounts
     const video = document.getElementById("vid360") as HTMLVideoElement | null;
     if (video) {
-      const videoSrc = getVideoSrc("N4Ya01cvSRoJX2S7JsMEAwTCvrsOqmbUjP00E767qNdbo"); // Tu playback ID real
+      const videoSrc = getVideoSrc("VQ1yPMehRhzKcH8Kv502Sh33IKjEHezxA54LB9MpAalM"); // Tu playback ID real
       video.setAttribute("src", videoSrc);
+      // Force video to start loading immediately
+      video.load();
     }
   }, []);
 
@@ -28,6 +30,27 @@ export default function App() {
       console.error("Video element not found");
       return;
     }
+
+    // Request fullscreen on mobile to avoid Safari UI
+    const enterFullscreen = () => {
+      // Try webkit fullscreen first (iOS Safari)
+      if ((video as any).webkitEnterFullscreen) {
+        try {
+          (video as any).webkitEnterFullscreen();
+        } catch (e) {
+          console.log("Webkit fullscreen not available:", e);
+        }
+      }
+      // Try standard fullscreen API as fallback
+      else if (video.requestFullscreen) {
+        video.requestFullscreen().catch((e) => {
+          console.log("Fullscreen not available:", e);
+        });
+      }
+    };
+
+    // Enter fullscreen before playing
+    enterFullscreen();
 
     // Try to play with audio first, fallback to muted if blocked
     video.muted = false;
@@ -99,6 +122,7 @@ export default function App() {
             muted
             autoPlay
             loop
+            preload="auto"
             crossOrigin="anonymous"
           ></video>
         </AAssets>
