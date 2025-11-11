@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Video 360°</title>
+</head>
+<body>
+    <h1>Probando video 360°</h1>
+    <video
+        id="test-video"
+        controls
+        playsInline
+        webkit-playsinline="true"
+        muted
+        crossOrigin="anonymous"
+        width="640"
+        height="360"
+    >
+        <source src="https://archive.org/download/360-degree-videos/360_degree_tunnel_test.mp4" type="video/mp4">
+    </video>
+    <br>
+    <button onclick="playVideo()">Reproducir</button>
+    <button onclick="pauseVideo()">Pausar</button>
+
+    <script>
+        function playVideo() {
+            const video = document.getElementById('test-video');
+            video.play();
+        }
+
+        function pauseVideo() {
+            const video = document.getElementById('test-video');
+            video.pause();
+        }
+    </script>
+</body>
+</html>

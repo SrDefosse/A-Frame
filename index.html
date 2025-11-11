@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <title>Experiencia VR 360°</title>
+    
+    <!-- A-Frame CDN with iOS/Android detection -->
+    <script>
+      (function() {
+        var isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+        var s = document.createElement('script');
+        s.src = isIOS
+          ? 'https://aframe.io/releases/1.2.0/aframe.min.js'
+          : 'https://aframe.io/releases/1.4.2/aframe.min.js';
+        document.head.appendChild(s);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
