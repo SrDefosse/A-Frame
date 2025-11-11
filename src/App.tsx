@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getVideoSrc } from "./utils/getVideoSrc";
 
 // Componentes A-Frame tipados
@@ -9,13 +9,31 @@ const AEntity = 'a-entity' as any;
 
 export default function App() {
   const hasStartedRef = useRef(false);
+  const [videoError, setVideoError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Set video source dynamically based on platform when component mounts
     const video = document.getElementById("vid360") as HTMLVideoElement | null;
     if (video) {
-      const videoSrc = getVideoSrc("VQ1yPMehRhzKcH8Kv502Sh33IKjEHezxA54LB9MpAalM"); // Tu playback ID real
+      const videoSrc = getVideoSrc("VQ1yPMehRhzKcH8Kv502Sh33IKjEHezxA54LB9MpAalM");
+      console.log("Loading video from:", videoSrc);
       video.setAttribute("src", videoSrc);
+      
+      // Add error handler
+      video.addEventListener("error", (e) => {
+        console.error("Video loading error:", e);
+        setVideoError("Error al cargar el video. Por favor recarga la página.");
+        setIsLoading(false);
+      });
+
+      // Add success handler
+      video.addEventListener("loadeddata", () => {
+        console.log("Video loaded successfully");
+        setIsLoading(false);
+        setVideoError(null);
+      });
+
       // Force video to start loading immediately
       video.load();
     }
@@ -98,9 +116,28 @@ export default function App() {
           <p className="text-sm text-gray-400 mb-8">
             Para una mejor experiencia, usa tus gafas de realidad virtual.
           </p>
+          
+          {/* Loading indicator */}
+          {isLoading && !videoError && (
+            <div className="mb-6">
+              <div className="flex items-center justify-center gap-2">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <span className="text-sm text-gray-300">Cargando video...</span>
+              </div>
+            </div>
+          )}
+
+          {/* Error message */}
+          {videoError && (
+            <div className="mb-6 p-4 bg-red-500 bg-opacity-20 border border-red-500 rounded-lg">
+              <p className="text-sm text-red-200">{videoError}</p>
+            </div>
+          )}
+
           <button
             onClick={handleStart}
-            className="rounded-full px-12 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-lg shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-300"
+            disabled={isLoading || !!videoError}
+            className="rounded-full px-12 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-lg shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             Iniciar
           </button>
@@ -110,20 +147,17 @@ export default function App() {
       {/* A-Frame VR Scene */}
       <AScene
         embedded
-        device-orientation-permission-ui="enabled: true"
         vr-mode-ui="enabled: true"
         renderer="colorManagement: true; antialias: true"
       >
-        <AAssets timeout="15000">
+        <AAssets timeout="30000">
           <video
             id="vid360"
             playsInline
             webkit-playsinline="true"
             muted
-            autoPlay
             loop
             preload="auto"
-            crossOrigin="anonymous"
           ></video>
         </AAssets>
 
