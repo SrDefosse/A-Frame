@@ -1,6 +1,12 @@
 import { useEffect, useRef } from "react";
 import { getVideoSrc } from "./utils/getVideoSrc";
 
+// Componentes A-Frame tipados
+const AScene = 'a-scene' as any;
+const AAssets = 'a-assets' as any;
+const AVideosphere = 'a-videosphere' as any;
+const AEntity = 'a-entity' as any;
+
 export default function App() {
   const hasStartedRef = useRef(false);
 
@@ -72,13 +78,13 @@ export default function App() {
       </div>
 
       {/* A-Frame VR Scene */}
-      <a-scene
+      <AScene
         embedded
         device-orientation-permission-ui="enabled: true"
         vr-mode-ui="enabled: true"
         renderer="colorManagement: true; antialias: true"
       >
-        <a-assets timeout="15000">
+        <AAssets timeout="15000">
           <video
             id="vid360"
             playsInline
@@ -88,16 +94,16 @@ export default function App() {
             loop
             crossOrigin="anonymous"
           ></video>
-        </a-assets>
+        </AAssets>
 
-        <a-videosphere src="#vid360" rotation="0 -90 0"></a-videosphere>
+        <AVideosphere src="#vid360" rotation="0 -90 0"></AVideosphere>
 
-        <a-entity
+        <AEntity
           camera
           look-controls="enabled: true"
           wasd-controls="enabled: false"
-        ></a-entity>
-      </a-scene>
+        ></AEntity>
+      </AScene>
     </div>
   );
 }
